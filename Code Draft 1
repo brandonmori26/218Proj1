@@ -1,0 +1,78 @@
+#ifndef _ARM_BOOK_LIB_H_
+#define _ARM_BOOK_LIB_H_
+
+//=====[Libraries]=============================================================
+
+#include <mbed.h>
+
+//=====[Declaration of public defines]=========================================
+
+// Functional states
+#ifndef OFF
+#define OFF    0
+#endif
+#ifndef ON
+#define ON     (!OFF)
+#endif
+
+// Electrical states
+#ifndef LOW
+#define LOW    0
+#endif
+#ifndef HIGH
+#define HIGH   (!LOW)
+#endif
+
+#define delay(ms)      thread_sleep_for( ms )
+
+//=====[#include guards - end]=================================================
+
+#endif // _ARM_BOOK_LIB_H_
+#include "mbed.h"
+#include "arm_book_lib.h"
+
+void uartTask();
+void availableCommands();
+
+// main() runs in its own thread in the OS
+int main()
+{
+    DigitalIn ignitionButton(D7);
+    DigitalIn pSeatButton(D6);
+    DigitalIn dSeatButton(D5);
+    DigitalIn pSeatBelt(D4);
+    DigitalIn dSeatBelt(D3);
+
+    DigitalOut ignitionLed(LED1);
+    DigitalOut engineLed(LED2);
+
+    gasDetector.mode(PullDown);
+    overTempDetector.mode(PullDown);
+    ignitionButton.mode(PullDown);
+    pSeatButton.mode(PullDown);
+    dSeatButton.mode(PullDown);
+    pSeatBelt.mode(PullDown);
+    dSeatBelt.mode(PullDown);
+
+    ignitionLed = OFF;
+    engineLed = OFF;
+    
+    while (true) {
+        if ( dSeatButton ) {
+            uartUsb.write( "Welcome to enhanced alarm system model 218-W24\r\n", 48);
+
+        }
+        if ( dSeatButton && pSeatButton && dSeatBelt && pSeatBelt ) {
+            ignitionLed = ON;
+        
+        if (ignitionButton) {
+            if (ignitionLed) {
+                engineLed = ON;
+                uartUsb.write( "Engine Started\r\n", 16);
+
+            }
+        }
+
+        
+    }
+}
